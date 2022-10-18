@@ -1,8 +1,16 @@
-const express = require('express')
-const path = require('path')
-const { viewIndex } = require('../../controllers/Demo')
-const router = express.Router()
+const express = require("express");
+const path = require("path");
+const { authController } = require("../../controllers/authController");
+const { employeeDetails } = require("../../controllers/employeeDetails");
+const { handleNewUser } = require("../../controllers/registerController");
+const router = express.Router();
 
-router.use('/display', viewIndex)
+router.use("/display", employeeDetails);
 
-module.exports = router
+router.use("/new", handleNewUser);
+
+router.post('/', authController)
+
+router.route('/employeess')
+.get(employeeDetails)
+module.exports = router;
