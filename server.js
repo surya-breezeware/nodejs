@@ -5,8 +5,35 @@ const cors = require('cors')
 const { corsOptions } = require('./config/CorsOptions')
 const cookieParser = require('cookie-parser')
 const verifyJWT = require('./middleware/verifyJWT')
-
+const mongoose = require('mongoose')
 var session = require('express-session')
+const user = require('./data/user')
+const credentials = require('./middleware/credentials')
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.urlencoded({ extended: true }))
+const url = 'mongodb://localhost/fusionAuth'
+
+mongoose.connect(url)
+
+const connection = mongoose.connection
+
+connection.on('open', () => {
+  console.log('Connected')
+})
+
+const users = new user({
+  userId: 1,
+  name: 'surya',
+  email: 'surya@breezeware.net',
+})
+
+try {
+  const userRes = users.save()
+  console.log(userRes)
+} catch (err) {
+  console.log(err)
+}
 
 // Retrieve User by Email Address
 // client.retrieveUserByEmail('karthik@breezeware.net').then(handleResponse)
@@ -16,7 +43,7 @@ var session = require('express-session')
 // }
 
 // cors
-
+app.use(credentials)
 app.use(cors(corsOptions))
 
 // middleware
@@ -41,7 +68,7 @@ app.get('/new', (req, res) => {
   console.log('Hello')
   res.sendFile(path.join(__dirname, 'views', 'new.html'))
 })
-app.use('/login', require('./routes/api/fusionAuth'))
+// app.use('/login', require('./routes/api/fusionAuth'))
 
 app.get('/profile', function (req, res) {
   if (!req.session.user) {
@@ -50,13 +77,13 @@ app.get('/profile', function (req, res) {
     res.send('Profile')
   }
 })
-// app.use('/login', require('./routes/api/employee'))
-// app.use('/refresh', require('./routes/api/refresh'))
+app.use('/login', require('./routes/api/auth'))
+app.use('/refresh', require('./routes/api/refresh'))
 
-// app.use('/logout', require('./routes/api/logout'))
-// app.use(verifyJWT)
+app.use('/logout', require('./routes/api/logout'))
+app.use(verifyJWT)
 
-// app.use('/employee', require('./routes/api/employee'))
+app.use('/employee', require('./routes/api/employee'))
 
 // routes
 

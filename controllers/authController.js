@@ -23,9 +23,14 @@ const authController = async (req, res) => {
 
   const match = await bcrypt.compare(password, foundUser.password)
   if (match) {
+    const roles = Object.values(foundUser.roles)
+
     const accessToken = jwt.sign(
       {
-        userName: foundUser.userName,
+        userInfo: {
+          userName: foundUser.userName,
+          roles: roles,
+        },
       },
       process.env.ACCESS_TOKEN_SECRET,
       {
@@ -53,8 +58,8 @@ const authController = async (req, res) => {
     )
     res.cookie('jwt', refreshToken, {
       httpOnly: true,
-      sameSite: 'none',
-      secure: true,
+      sameSite: 'None',
+      // secure: true, secure false in postman and secure true in browder or production application
       maxAge: 24 * 60 * 1000,
     })
     res.json({ accessToken, currentUser })

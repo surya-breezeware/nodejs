@@ -16,7 +16,7 @@ const fusionAuthController = (req, res) => {
     const obj = {
       loginId: 'akash@breezeware.net',
       password: 'breeze123',
-      applicationId: '8aaf65e1-9506-46c8-a166-868114f066ee',
+      // applicationId: '8aaf65e1-9506-46c8-a166-868114f066ee',
     }
 
     client

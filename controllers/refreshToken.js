@@ -1,47 +1,51 @@
 const userDB = {
-    users: require("../data/users.json"),
-    setUsers: function(data) {
-      this.users = data;
-    },
-  };
-  
-  const fspromises = require("fs").promises;
-  const path = require("path");
-  const bcrypt = require("bcrypt");
+  users: require('../data/users.json'),
+  setUsers: function (data) {
+    this.users = data
+  },
+}
 
-  const jwt=require('jsonwebtoken')
-  require('dotenv').config()
+const fspromises = require('fs').promises
+const path = require('path')
+const bcrypt = require('bcrypt')
 
-  const refreshTokenHandler= (req,res)=>{
-    const cookies=req.cookies
-    if (!cookies?.jwt) {
-      return res.sendStatus(401)
-    }
-    console.log(cookies.jwt);
-    const refreshToken=cookies.jwt
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
-    const foundUser = userDB.users?.find(person=>
-        person.refreshToken===refreshToken
-    )
-
-if(!foundUser) return res.sendStatus(401)
-
-jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,
-    (err,decoded)=>{
-        if(err||foundUser.userName!==decoded.userName) return res.sendStatus(403)
-        const accessToken=jwt.sign({
-            "userName":decoded .userName},
-            process.env.ACCESS_TOKEN_SECRET,
-            {
-                expiresIn:'30s'
-            }
-        )
-
-        res.json({accessToken})
-    }
-    )
-
-
+const refreshTokenHandler = (req, res) => {
+  const cookies = req.cookies
+  if (!cookies?.jwt) {
+    return res.sendStatus(401)
   }
+  console.log(cookies.jwt)
+  const refreshToken = cookies.jwt
 
-  module.exports={refreshTokenHandler}
+  const foundUser = userDB.users?.find(
+    (person) => person.refreshToken === refreshToken,
+  )
+
+  if (!foundUser) return res.sendStatus(401)
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+    if (err || foundUser.userName !== decoded.userName) {
+      return res.sendStatus(403)
+    }
+    const roles = Object.values(foundUser.roles)
+    const accessToken = jwt.sign(
+      {
+        userInfo: {
+          userName: foundUser.userName,
+          roles: roles,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: '30s',
+      },
+    )
+
+    res.json({ accessToken })
+  })
+}
+
+module.exports = { refreshTokenHandler }
