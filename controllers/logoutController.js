@@ -1,9 +1,4 @@
-const userDB = {
-  users: require('../data/users.json'),
-  setUsers: function (data) {
-    this.users = data
-  },
-}
+const UserDB = require('../data/User')
 
 const fspromises = require('fs').promises
 const path = require('path')
@@ -28,16 +23,9 @@ const handleLogout = async (req, res) => {
     return res.sendStatus(204)
   }
 
-  const otherUsers = userDB.users.filter(
-    (person) => person.refreshToken !== foundUser.refreshToken,
-  )
-
-  const currentUser = { ...foundUser, refreshToken: '' }
-  userDB.setUsers([...otherUsers, currentUser])
-  await fspromises.writeFile(
-    path.join(__dirname, '..', 'data', 'users.json'),
-    JSON.stringify(userDB.users),
-  )
+  foundUser.refreshToken = ''
+  const result = await foundUser.save()
+  console.log(result)
 
   res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true })
   res.sendStatus(204)

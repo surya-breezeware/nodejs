@@ -1,18 +1,12 @@
-const userDB = {
-  users: require('../data/users.json'),
-  setUsers: function (data) {
-    this.users = data
-  },
-}
+const UserDB = require('../data/User')
 
 const fspromises = require('fs').promises
 const path = require('path')
 const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken')
-require('dotenv').config()
 
-const refreshTokenHandler = (req, res) => {
+const refreshTokenHandler = async (req, res) => {
   const cookies = req.cookies
   if (!cookies?.jwt) {
     return res.sendStatus(401)
@@ -20,9 +14,7 @@ const refreshTokenHandler = (req, res) => {
   console.log(cookies.jwt)
   const refreshToken = cookies.jwt
 
-  const foundUser = userDB.users?.find(
-    (person) => person.refreshToken === refreshToken,
-  )
+  const foundUser = await UserDB.findOne({ refreshToken }).exec()
 
   if (!foundUser) return res.sendStatus(401)
 

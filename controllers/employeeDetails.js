@@ -1,13 +1,46 @@
 const path = require('path')
-const userDB = {
-  users: require("../data/users.json"),
-  setUsers: function(data) {
-    this.users = data;
-  },
-};
+const employeeDB = require('../data/Employee')
 
-const employeeDetails = (req, res) => {
-  res.json(userDB.users)
+const employeeDetails = async (req, res) => {
+  const employee = await employeeDB.find()
+  if (!employee) {
+    console.log(employee, 'emp')
+    return res.status(204).json({ message: 'N0 employees found' })
+  }
+
+  // console.log(collection)
+
+  // collection.find({}).toArray((err, result) => {
+  //   if (err) {
+  //     res.send('err')
+  //   } else {
+  //     res.send(result)
+  //   }
+  // })
+  res.json(employee)
 }
 
-module.exports = { employeeDetails }
+const createNewEmployee = async (req, res) => {
+  console.log('sdf')
+  if (!req?.body?.firstName || !req?.body?.lastName) {
+    res.status.json({ message: 'first or last name missing' })
+  }
+
+  const duplicate = await employeeDB
+    .findOne({ firstName: req?.body?.firstName })
+    .exec()
+
+  if (duplicate) {
+    res.status(409).json({ message: 'First Name already exist' })
+  } else {
+    try {
+      const result = await employeeDB.create(req?.body)
+      result.save()
+      res.sendStatus(201)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+}
+
+module.exports = { employeeDetails, createNewEmployee }
