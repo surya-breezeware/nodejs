@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-const auth = new mongoose.Schema({
+const auth = new Schema({
   userId: {
     type: Number,
     // required: true,
@@ -20,4 +21,4 @@ const auth = new mongoose.Schema({
   },
 })
 
-module.exports = mongoose.model('auth', auth)
+module.exports = mongoose.model('Crud-Auth', auth)

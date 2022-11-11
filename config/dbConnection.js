@@ -5,6 +5,7 @@ const connectDB = async () => {
     await mongoose.connect(process.env.DATABASE_URI, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
+      dbName: 'crud',
     })
   } catch (err) {
     console.log(err)

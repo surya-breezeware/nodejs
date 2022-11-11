@@ -43,4 +43,29 @@ const createNewEmployee = async (req, res) => {
   }
 }
 
-module.exports = { employeeDetails, createNewEmployee }
+const updateEmployee = async (req, res) => {
+  console.log('sdf')
+  if (!req?.body?.firstName || !req?.body?.lastName) {
+    res.status.json({ message: 'first or last name missing' })
+  }
+  const duplicate = await employeeDB
+    .findOne({ firstName: req?.body?.firstName })
+    .exec()
+
+  if (duplicate) {
+    res.status(409).json({ message: 'First Name already exist' })
+  } else {
+    try {
+      const employee = await employeeDB.findOne({ userId: req.body.userId })
+      employee.firstName = req.body?.firstName
+
+      // const result = await employeeDB.create(req?.body)
+      employee.save()
+      res.sendStatus(204)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+}
+
+module.exports = { employeeDetails, createNewEmployee, updateEmployee }

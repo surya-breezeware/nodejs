@@ -11,6 +11,7 @@ var session = require('express-session')
 const credentials = require('./middleware/credentials')
 const bodyParser = require('body-parser')
 const connectDB = require('./config/dbConnection')
+const User = require('./data/User')
 
 //Connect db
 
@@ -86,7 +87,7 @@ app.use('/', require('./routes/api/auth'))
 app.use('/refresh', require('./routes/api/refresh'))
 
 app.use('/logout', require('./routes/api/logout'))
-app.use(verifyJWT)
+// app.use(verifyJWT)
 
 app.use('/employee', require('./routes/api/employee'))
 
@@ -117,3 +118,7 @@ mongoose.connection.once('open', () => {
     console.log('server running')
   })
 })
+
+// User.createCollection().then(function (collection) {
+//   console.log('Collection is created!')
+// })
